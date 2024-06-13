@@ -3996,6 +3996,9 @@ PreCheckoutQuery::Ptr TgTypeParser::parseJsonAndGetPreCheckoutQuery(const boost:
     result->from = tryParseJson(&TgTypeParser::parseJsonAndGetUser, data, "user");
     result->currency = data.get<std::string>("currency", "");
     result->totalAmount = data.get<std::int32_t>("total_amount", 0);
+    result->invoicePayload = data.get<std::string>("invoice_payload", "");
+    result->shippingOptionId = data.get<std::string>("shipping_option_id", "");
+    result->orderInfo = tryParseJson(&TgTypeParser::parseJsonAndGetOrderInfo, data, "order_info");
     return result;
 }
 
@@ -4008,6 +4011,11 @@ std::string TgTypeParser::parsePreCheckoutQuery(const PreCheckoutQuery::Ptr& obj
     result += ",";
     appendToJson(result, "currency", object->currency);
     appendToJson(result, "total_amount", object->totalAmount);
+    appendToJson(result, "invoice_payload", object->invoicePayload);
+    appendToJson(result, "shipping_option_id", object->shippingOptionId);
+    result += R"("order_info":)";
+    result += parseOrderInfo(object->orderInfo);
+    result += ",";
     removeLastComma(result);
     result += '}';
     return result;
